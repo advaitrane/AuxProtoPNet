@@ -1,0 +1,3 @@
+# ignore saved models
+saved_model*
+__pycache__
