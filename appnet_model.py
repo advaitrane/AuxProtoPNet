@@ -128,14 +128,13 @@ class AuxPPNet(nn.Module):
                     nn.Sigmoid()
                     )
         
-        self.prototype_vectors = None
+        self.prototype_vectors = torch.zeros(
+            self.prototype_shape,
+            requires_grad=False
+            )
         self.num_prototype_patches = torch.zeros(
             (self.num_prototypes,1,1,1),
             requires_grad=False
-            )
-        self.register_buffer("prototype_vectors", self.prototype_vectors)
-        self.register_buffer(
-            "num_prototype_patches", self.num_prototype_patches
             )
 
         # do not make this just a tensor,
@@ -157,15 +156,13 @@ class AuxPPNet(nn.Module):
         x = self.add_on_layers(x)
         return x
 
+    def prototype_to_device(self, device):
+        self.prototype_vectors = self.prototype_vectors.to(device)
+        self.num_prototype_patches = self.num_prototype_patches.to(device)
+
     def reset_prototypes(self):
-        self.prototype_vectors = torch.zeros(
-            self.prototype_shape,
-            requires_grad=False
-            )
-        self.num_prototype_patches = torch.zeros(
-            (self.num_prototypes,1,1,1),
-            requires_grad=False
-            )   
+        self.prototype_vectors[:] = 0
+        self.num_prototype_patches[:] = 0
 
     def update_prototypes(self, patch_x, patch_labels):
         if self.patch_encoder_type == "same":
@@ -354,23 +351,35 @@ class AuxPPNet(nn.Module):
 
 
 
-def construct_APPNet(base_architecture, pretrained=True, img_size=224,
-                    prototype_shape=(2000, 512, 1, 1), num_classes=200,
-                    prototype_activation_function='log',
-                    add_on_layers_type='bottleneck'):
+def construct_APPNet(
+    base_architecture, 
+    prototype_class_identity, 
+    pretrained=True, 
+    img_size=224,
+    prototype_shape=(112, 128, 1, 1), 
+    num_classes=200,
+    patch_encoder_type='same',
+    update_grads_for_prototypes=False,
+    prototype_activation_function='log',
+    add_on_layers_type='bottleneck'
+):
     features = base_architecture_to_features[base_architecture](pretrained=pretrained)
     layer_filter_sizes, layer_strides, layer_paddings = features.conv_info()
     proto_layer_rf_info = compute_proto_layer_rf_info_v2(img_size=img_size,
                                                          layer_filter_sizes=layer_filter_sizes,
                                                          layer_strides=layer_strides,
                                                          layer_paddings=layer_paddings,
-                                                         prototype_kernel_size=prototype_shape[2])
-    return PPNet(features=features,
-                 img_size=img_size,
-                 prototype_shape=prototype_shape,
-                 proto_layer_rf_info=proto_layer_rf_info,
-                 num_classes=num_classes,
-                 init_weights=True,
-                 prototype_activation_function=prototype_activation_function,
-                 add_on_layers_type=add_on_layers_type)
+                                                         prototype_kernel_size=1)
+    return appnet_model.AuxPPNet(
+        features,
+        img_size,
+        prototype_shape,
+        proto_layer_rf_info,
+        num_classes,
+        prototype_class_identity,
+        patch_encoder_type=patch_encoder_type,
+        update_grads_for_prototypes=update_grads_for_prototypes,
+        prototype_activation_function=prototype_activation_function,
+        add_on_layers_type=add_on_layers_type
+    )
 

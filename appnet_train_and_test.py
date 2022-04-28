@@ -1,10 +1,20 @@
 import time
 import torch
+# import tqdm as tqdm
 
 from helpers import list_of_distances, make_one_hot
 
-def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l1_mask=True,
-                   coefs=None, log=print):
+def _train_or_test(
+    model, 
+    dataloader, 
+    aux_dataloader,
+    prototype_update_iter_step=10,
+    optimizer=None, 
+    class_specific=True, 
+    use_l1_mask=True,
+    coefs=None, 
+    log=print
+    ):
     '''
     model: the multi-gpu model
     dataloader:
@@ -24,6 +34,9 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     for i, (image, label) in enumerate(dataloader):
         input = image.cuda()
         target = label.cuda()
+
+        if i%prototype_update_iter_step == 0:
+            set_prototypes(model, aux_dataloader)
 
         # torch.enable_grad() has no effect outside of no_grad()
         grad_req = torch.enable_grad() if is_train else torch.no_grad()
@@ -108,7 +121,7 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
 
     end = time.time()
 
-    log('\ttime: \t{0}'.format(end - start))
+    log('\ttime: \t{0}'.format(end -  start))
     log('\tcross ent: \t{0}'.format(total_cross_entropy / n_batches))
     log('\tcluster: \t{0}'.format(total_cluster_cost / n_batches))
     if class_specific:
@@ -124,20 +137,51 @@ def _train_or_test(model, dataloader, optimizer=None, class_specific=True, use_l
     return n_correct / n_examples
 
 
-def train(model, dataloader, optimizer, class_specific=False, coefs=None, log=print):
+def set_prototypes(model, aux_dataloader):
+    model.module.reset_prototypes()
+    for patch, patch_label in aux_dataloader:
+        patch = patch.cuda()
+        patch_label = patch_label.cuda()
+        model.module.update_prototypes(patch, patch_label)
+    model.module.normalise_prototypes()
+
+def train(
+    model, 
+    dataloader, 
+    aux_dataloader, 
+    prototype_update_iter_step,
+    optimizer, 
+    class_specific=False, 
+    coefs=None, 
+    log=print
+    ):
     assert(optimizer is not None)
     
     log('\ttrain')
     model.train()
-    return _train_or_test(model=model, dataloader=dataloader, optimizer=optimizer,
-                          class_specific=class_specific, coefs=coefs, log=log)
+    return _train_or_test(
+        model=model, 
+        dataloader=dataloader, 
+        aux_dataloader=aux_dataloader, 
+        prototype_update_iter_step=prototype_update_iter_step,
+        optimizer=optimizer,
+        class_specific=class_specific, 
+        coefs=coefs, 
+        log=log
+        )
 
 
-def test(model, dataloader, class_specific=False, log=print):
+def test(model, dataloader, aux_dataloader, class_specific=False, log=print):
     log('\ttest')
     model.eval()
-    return _train_or_test(model=model, dataloader=dataloader, optimizer=None,
-                          class_specific=class_specific, log=log)
+    return _train_or_test(
+        model=model, 
+        dataloader=dataloader, 
+        aux_dataloader=aux_dataloader,
+        optimizer=None,
+        class_specific=class_specific, 
+        log=log
+        )
 
 
 def last_only(model, log=print):
@@ -145,7 +189,6 @@ def last_only(model, log=print):
         p.requires_grad = False
     for p in model.module.add_on_layers.parameters():
         p.requires_grad = False
-    model.module.prototype_vectors.requires_grad = False
     for p in model.module.last_layer.parameters():
         p.requires_grad = True
     
@@ -157,7 +200,6 @@ def warm_only(model, log=print):
         p.requires_grad = False
     for p in model.module.add_on_layers.parameters():
         p.requires_grad = True
-    model.module.prototype_vectors.requires_grad = True
     for p in model.module.last_layer.parameters():
         p.requires_grad = True
     
@@ -169,7 +211,6 @@ def joint(model, log=print):
         p.requires_grad = True
     for p in model.module.add_on_layers.parameters():
         p.requires_grad = True
-    model.module.prototype_vectors.requires_grad = True
     for p in model.module.last_layer.parameters():
         p.requires_grad = True
     
