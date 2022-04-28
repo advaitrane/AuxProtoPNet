@@ -1,7 +1,7 @@
 import os
 import numpy as np
 
-cub_data_dir = "/content/drive/MyDrive/CS_566_DDL/CBM/CUB_200_2011"
+# cub_data_dir = "/content/drive/MyDrive/CS_566_DDL/CBM/CUB_200_2011"
 
 def load_attributes_file(cub_data_dir):
     attributes_file = "attributes/attributes.txt"
