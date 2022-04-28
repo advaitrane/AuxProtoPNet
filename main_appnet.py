@@ -11,7 +11,7 @@ import argparse
 import re
 
 from helpers import makedir
-import model
+import appnet_model
 import push
 import prune
 import train_and_test as tnt
@@ -122,7 +122,7 @@ for idx_attr, attr in enumerate(attr_in_concepts):
         )
 
 # construct the model
-appnet = model_appnet.construct_APPNet(
+appnet = appnet_model.construct_APPNet(
     base_architecture, 
     prototype_class_identity, 
     pretrained=True, 

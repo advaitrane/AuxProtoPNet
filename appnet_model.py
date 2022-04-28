@@ -370,7 +370,7 @@ def construct_APPNet(
                                                          layer_strides=layer_strides,
                                                          layer_paddings=layer_paddings,
                                                          prototype_kernel_size=1)
-    return appnet_model.AuxPPNet(
+    return AuxPPNet(
         features,
         img_size,
         prototype_shape,
