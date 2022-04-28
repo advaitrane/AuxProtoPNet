@@ -133,6 +133,10 @@ class AuxPPNet(nn.Module):
             (self.num_prototypes,1,1,1),
             requires_grad=False
             )
+        self.register_buffer("prototype_vectors", self.prototype_vectors)
+        self.register_buffer(
+            "num_prototype_patches", self.num_prototype_patches
+            )
 
         # do not make this just a tensor,
         # since it will not be moved automatically to gpu
@@ -265,7 +269,7 @@ class AuxPPNet(nn.Module):
         prototype_activations = self.distance_2_similarity(min_distances)
         logits = self.last_layer(prototype_activations)
         return logits, min_distances
-
+    """
     def push_forward(self, x):
         '''this method is needed for the pushing operation'''
         conv_output = self.conv_features(x)
@@ -298,7 +302,7 @@ class AuxPPNet(nn.Module):
         # self.prototype_class_identity is torch tensor
         # so it does not need .data access for value update
         self.prototype_class_identity = self.prototype_class_identity[prototypes_to_keep, :]
-
+    """
     def __repr__(self):
         # PPNet(self, features, img_size, prototype_shape,
         # proto_layer_rf_info, num_classes, init_weights=True):
@@ -350,7 +354,7 @@ class AuxPPNet(nn.Module):
 
 
 
-def construct_PPNet(base_architecture, pretrained=True, img_size=224,
+def construct_APPNet(base_architecture, pretrained=True, img_size=224,
                     prototype_shape=(2000, 512, 1, 1), num_classes=200,
                     prototype_activation_function='log',
                     add_on_layers_type='bottleneck'):
