@@ -100,7 +100,9 @@ log('test set size: {0}'.format(len(test_loader.dataset)))
 log('batch size: {0}'.format(train_batch_size))
 
 # Getting class attribute labels
-class_attr_proc = load_aux_metadata(cub_data_dir)
+attr_proc, class_attr_proc, attributes_dict, class_dict = load_aux_metadata(
+    cub_data_dir
+    )
 
 # Cnverting to prototype class identity
 attr_in_concepts = [attributes_dict[i].replace('::', '_') for i in attr_proc]

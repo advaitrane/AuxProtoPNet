@@ -45,7 +45,7 @@ def denoise(class_attributes_df, proportion_threshold = 47.5):
             class_attr_proc.append(class_attr[:, col].reshape(-1,1))
 
     class_attr_proc = np.concatenate(class_attr_proc,1)
-    return class_attr_proc
+    return attr_proc, class_attr_proc
 
 def load_aux_metadata(cub_data_dir, proportion_threshold=47.5):
     attributes_df, attributes_dict = load_attributes_file(cub_data_dir)
@@ -55,5 +55,5 @@ def load_aux_metadata(cub_data_dir, proportion_threshold=47.5):
         attributes_df, 
         class_df
         ) 
-    class_attr_proc = denoise(class_attributes_df, proportion_threshold)
-    return class_attr_proc
+    attr_proc, class_attr_proc = denoise(class_attributes_df, proportion_threshold)
+    return attr_proc, class_attr_proc, attributes_dict, class_dict
