@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import pandas as pd
 
 # cub_data_dir = "/content/drive/MyDrive/CS_566_DDL/CBM/CUB_200_2011"
 

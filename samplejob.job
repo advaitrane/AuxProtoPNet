@@ -17,4 +17,4 @@ pip3 install torch torchvision
 pip install Augmentor
 pip install numpy
 pip install opencv-python
-python appnet_main.py
+python main_appnet.py
