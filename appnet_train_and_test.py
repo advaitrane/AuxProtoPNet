@@ -31,14 +31,15 @@ def _train_or_test(
     total_separation_cost = 0
     total_avg_separation_cost = 0
 
-    for idx_batch, (image, label) in enumerate(dataloader):
+    for idx_batch, (image, label) in tqdm(enumerate(dataloader)):
         input = image.cuda()
         target = label.cuda()
 
+        # print("Iteration: ", idx_batch)
         if idx_batch%prototype_update_iter_step == 0:
-            log("Setting prototypes")
+            # log("Setting prototypes")
             set_prototypes(model, aux_dataloader)
-            log("Prototypes set")
+            # log("Prototypes set")
 
         # torch.enable_grad() has no effect outside of no_grad()
         grad_req = torch.enable_grad() if is_train else torch.no_grad()
@@ -111,6 +112,8 @@ def _train_or_test(
                           + coefs['l1'] * l1)
                 else:
                     loss = cross_entropy + 0.8 * cluster_cost + 1e-4 * l1
+            
+            # print("Backward 1 iter: ", idx_batch)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -140,14 +143,29 @@ def _train_or_test(
 
 
 def set_prototypes(model, aux_dataloader):
+
+    # model.module.reset_prototypes()
+    # for idx_patch, (patch, patch_label) in enumerate(aux_dataloader):
+    #     patch = patch.cuda()
+    #     patch_label = patch_label.cuda()
+    #     if model.module.update_grads_for_prototypes and idx_patch == 0:
+    #         model.module.update_prototypes(patch, patch_label, True)
+    #     else:
+    #         model.module.update_prototypes(patch, patch_label, False)
+    # model.module.normalise_prototypes()
+
     model.module.reset_prototypes()
-    for idx_patch, (patch, patch_label) in enumerate(aux_dataloader):
+    # prototypes_set = False
+    # while not prototypes_set:
+    for patch, patch_label in aux_dataloader:
+        # if len(torch.unique(patch_label)) != 112:
+        #     break
+
         patch = patch.cuda()
         patch_label = patch_label.cuda()
-        if model.module.update_grads_for_prototypes and idx_patch == 0:
-            model.module.update_prototypes(patch, patch_label, True)
-        else:
-            model.module.update_prototypes(patch, patch_label, False)
+        model.module.update_prototypes(patch, patch_label)
+        # prototypes_set = True
+            # break
     model.module.normalise_prototypes()
 
 def train(

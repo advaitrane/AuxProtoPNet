@@ -136,6 +136,7 @@ class AuxPPNet(nn.Module):
             (self.num_prototypes,1,1,1),
             requires_grad=False
             )
+        self.prototype_device = 'cpu'
 
         # do not make this just a tensor,
         # since it will not be moved automatically to gpu
@@ -156,17 +157,28 @@ class AuxPPNet(nn.Module):
         x = self.add_on_layers(x)
         return x
 
-    def prototype_to_device(self, device):
-        self.prototype_vectors = self.prototype_vectors.to(device)
-        self.num_prototype_patches = self.num_prototype_patches.to(device)
+    def prototype_to_device(self, device=None):
+        if not device is None:
+            self.prototype_device = device
+        self.prototype_vectors = self.prototype_vectors.to(self.prototype_device)
+        self.num_prototype_patches = self.num_prototype_patches.to(self.prototype_device)
 
     def reset_prototypes(self):
-        self.prototype_vectors[:] = 0
-        self.num_prototype_patches[:] = 0
+        del self.prototype_vectors
+        del self.num_prototype_patches
+        self.prototype_vectors = torch.zeros(
+            self.prototype_shape,
+            requires_grad=False
+            )
+        self.num_prototype_patches = torch.zeros(
+            (self.num_prototypes,1,1,1),
+            requires_grad=False
+            )
+        self.prototype_to_device()
 
-    def update_prototypes(self, patch_x, patch_labels, update_grads=False):
+    def update_prototypes(self, patch_x, patch_labels): # , update_grads=False):
         if self.patch_encoder_type == "same":
-            if self.update_grads_for_prototypes and update_grads:
+            if self.update_grads_for_prototypes: # and update_grads:
                 patch_emb = self.conv_features(patch_x)
             else:
                 with torch.no_grad():
@@ -183,9 +195,12 @@ class AuxPPNet(nn.Module):
             l = patch_labels[idx_emb]
             self.prototype_vectors[l, :, :, :] += emb
             self.num_prototype_patches[l,0,0,0] += 1
+            
+        # self.normalise_prototypes()
 
     def normalise_prototypes(self):
         # prototype is the mean of all embeddings for patches with given label
+        
         self.prototype_vectors = (
             self.prototype_vectors / self.num_prototype_patches
             )
