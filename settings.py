@@ -7,7 +7,7 @@ prototype_activation_function = 'log'
 add_on_layers_type = 'regular'
 patch_encoder_type = 'same'
 update_grads_for_prototypes = False
-prototype_update_iter_step = 1
+prototype_update_iter_step = 10
 
 experiment_run = '001'
 
