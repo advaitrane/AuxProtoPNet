@@ -141,7 +141,7 @@ def _train_or_test(
 
 def set_prototypes(model, aux_dataloader):
     model.module.reset_prototypes()
-    for idx_patch, (patch, patch_label) in tqdm(enumerate(aux_dataloader)):
+    for idx_patch, (patch, patch_label) in enumerate(aux_dataloader):
         patch = patch.cuda()
         patch_label = patch_label.cuda()
         if model.module.update_grads_for_prototypes and idx_patch == 0:
