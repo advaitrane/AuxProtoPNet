@@ -1,6 +1,6 @@
 import time
 import torch
-import tqdm as tqdm
+from tqdm import tqdm
 
 from helpers import list_of_distances, make_one_hot
 
