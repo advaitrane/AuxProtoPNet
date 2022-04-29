@@ -1,11 +1,31 @@
-import os
-import numpy as np
 import pandas as pd
+import os
+import shutil
+import numpy as np
 
-# cub_data_dir = "/content/drive/MyDrive/CS_566_DDL/CBM/CUB_200_2011"
+import torch
+import torch.utils.data
+# import torch.utils.data.distributed
+import torchvision.transforms as transforms
+import torchvision.datasets as datasets
+
+import argparse
+import re
+
+from helpers import makedir
+import model
+import push
+import prune
+import train_and_test as tnt
+import appnet_train_and_test as atnt
+import save
+from log import create_logger
+from preprocess import mean, std, preprocess_input_function
+
+cub_data_dir = "/content/drive/MyDrive/CS_566_DDL/CBM/CUB_200_2011"
 
 def load_attributes_file(cub_data_dir):
-    attributes_file = "attributes/attributes.txt"
+    attributes_file = "attributes.txt"
     attributes_df = pd.read_csv(
         os.path.join(cub_data_dir, attributes_file), 
         sep = ' ',
@@ -26,7 +46,7 @@ def load_class_file(cub_data_dir):
     return class_df, class_dict
 
 def load_class_attribute_file(cub_data_dir, attributes_df, class_df):
-    class_attributes_file = "attributes/class_attribute_labels_continuous.txt"
+    class_attributes_file = "class_attribute_labels_continuous.txt"
     class_attributes_df = pd.read_csv(
         os.path.join(cub_data_dir, class_attributes_file), 
         sep = ' ',

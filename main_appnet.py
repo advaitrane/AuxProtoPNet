@@ -11,9 +11,9 @@ import argparse
 import re
 
 from helpers import makedir
-import appnet_model
-# import push
-# import prune
+import appnet_model 
+import push
+import prune
 import train_and_test as tnt
 import appnet_train_and_test as atnt
 import save
@@ -137,8 +137,8 @@ appnet = appnet_model.construct_APPNet(
 
 #if prototype_activation_function == 'linear':
 #    ppnet.set_last_layer_incorrect_connection(incorrect_strength=0)
-appnet = appnet.cuda()
-appnet.prototype_to_device('cuda')
+# appnet = appnet.cuda()
+# appnet.prototype_to_device('cuda')
 appnet_multi = torch.nn.DataParallel(appnet)
 class_specific = True
 
