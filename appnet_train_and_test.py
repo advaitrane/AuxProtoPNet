@@ -1,6 +1,6 @@
 import time
 import torch
-# import tqdm as tqdm
+import tqdm as tqdm
 
 from helpers import list_of_distances, make_one_hot
 
@@ -31,12 +31,14 @@ def _train_or_test(
     total_separation_cost = 0
     total_avg_separation_cost = 0
 
-    for i, (image, label) in enumerate(dataloader):
+    for idx_batch, (image, label) in tqdm(enumerate(dataloader)):
         input = image.cuda()
         target = label.cuda()
 
-        if i%prototype_update_iter_step == 0:
+        if idx_batch%prototype_update_iter_step == 0:
+            log("Setting prototypes")
             set_prototypes(model, aux_dataloader)
+            log("Prototypes set")
 
         # torch.enable_grad() has no effect outside of no_grad()
         grad_req = torch.enable_grad() if is_train else torch.no_grad()
@@ -139,7 +141,7 @@ def _train_or_test(
 
 def set_prototypes(model, aux_dataloader):
     model.module.reset_prototypes()
-    for idx_patch, (patch, patch_label) in enumerate(aux_dataloader):
+    for idx_patch, (patch, patch_label) in tqdm(enumerate(aux_dataloader)):
         patch = patch.cuda()
         patch_label = patch_label.cuda()
         if model.module.update_grads_for_prototypes and idx_patch == 0:
