@@ -164,8 +164,6 @@ class AuxPPNet(nn.Module):
         self.num_prototype_patches = self.num_prototype_patches.to(self.prototype_device)
 
     def reset_prototypes(self):
-        del self.prototype_vectors
-        del self.num_prototype_patches
         self.prototype_vectors = torch.zeros(
             self.prototype_shape,
             requires_grad=False
