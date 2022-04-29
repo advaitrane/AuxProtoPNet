@@ -6,7 +6,7 @@ num_classes = 200
 prototype_activation_function = 'log'
 add_on_layers_type = 'regular'
 patch_encoder_type = 'same'
-update_grads_for_prototypes = True
+update_grads_for_prototypes = False
 prototype_update_iter_step = 1
 
 experiment_run = '001'
@@ -20,7 +20,7 @@ cub_data_dir = data_path + 'CUB_200_2011/'
 train_batch_size = 80
 test_batch_size = 100
 # train_push_batch_size = 75
-aux_batch_size = 64
+aux_batch_size = 560
 
 joint_optimizer_lrs = {'features': 1e-4,
                        'add_on_layers': 3e-3,

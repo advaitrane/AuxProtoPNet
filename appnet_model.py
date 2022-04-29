@@ -164,9 +164,9 @@ class AuxPPNet(nn.Module):
         self.prototype_vectors[:] = 0
         self.num_prototype_patches[:] = 0
 
-    def update_prototypes(self, patch_x, patch_labels):
+    def update_prototypes(self, patch_x, patch_labels, update_grads=False):
         if self.patch_encoder_type == "same":
-            if self.update_grads_for_prototypes:
+            if self.update_grads_for_prototypes and update_grads:
                 patch_emb = self.conv_features(patch_x)
             else:
                 with torch.no_grad():

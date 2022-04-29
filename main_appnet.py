@@ -80,7 +80,7 @@ test_dataset = datasets.ImageFolder(
         normalize,
     ]))
 test_loader = torch.utils.data.DataLoader(
-    test_dataset, batch_size=test_batch_size, shuffle=False,
+    test_dataset, batch_size=test_batch_size, shuffle=True,
     num_workers=4, pin_memory=False)
 # Aux set
 concept_dataset = datasets.ImageFolder(
@@ -91,7 +91,7 @@ concept_dataset = datasets.ImageFolder(
         normalize,
     ]))
 concept_loader = torch.utils.data.DataLoader(
-    concept_dataset, batch_size=aux_batch_size, shuffle=False,
+    concept_dataset, batch_size=aux_batch_size, shuffle=True,
     num_workers=4, pin_memory=False)
 
 # we should look into distributed sampler more carefully at torch.utils.data.distributed.DistributedSampler(train_dataset)

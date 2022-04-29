@@ -139,10 +139,13 @@ def _train_or_test(
 
 def set_prototypes(model, aux_dataloader):
     model.module.reset_prototypes()
-    for patch, patch_label in aux_dataloader:
+    for idx_patch, (patch, patch_label) in enumerate(aux_dataloader):
         patch = patch.cuda()
         patch_label = patch_label.cuda()
-        model.module.update_prototypes(patch, patch_label)
+        if model.module.update_grads_for_prototypes and idx_patch == 0:
+            model.module.update_prototypes(patch, patch_label, True)
+        else:
+            model.module.update_prototypes(patch, patch_label, False)
     model.module.normalise_prototypes()
 
 def train(
