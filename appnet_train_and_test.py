@@ -31,7 +31,7 @@ def _train_or_test(
     total_separation_cost = 0
     total_avg_separation_cost = 0
 
-    for idx_batch, (image, label) in tqdm(enumerate(dataloader)):
+    for idx_batch, (image, label) in enumerate(dataloader):
         input = image.cuda()
         target = label.cuda()
 

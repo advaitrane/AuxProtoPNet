@@ -6,7 +6,7 @@ num_classes = 200
 prototype_activation_function = 'log'
 add_on_layers_type = 'regular'
 patch_encoder_type = 'same'
-update_grads_for_prototypes = False
+update_grads_for_prototypes = True
 prototype_update_iter_step = 10
 
 experiment_run = '001'
