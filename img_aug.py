@@ -7,9 +7,10 @@ def makedir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-datasets_root_dir = './datasets/cub200_cropped/'
+datasets_root_dir = './datasets/cub200_cropped/dataset_copies/'
 dir = datasets_root_dir + 'train_cropped/'
-target_dir = datasets_root_dir + 'train_cropped_augmented/'
+# Add your username to <username>
+target_dir = '/scratch1/<username>/AuxProtoPNet/datasets/cub200_cropped/train_cropped_augmented/'
 
 makedir(target_dir)
 folders = [os.path.join(dir, folder) for folder in next(os.walk(dir))[1]]

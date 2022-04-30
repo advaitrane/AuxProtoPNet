@@ -213,7 +213,7 @@ for epoch in range(num_train_epochs):
         model_dir=model_dir, 
         model_name=str(epoch) + 'nopush', 
         accu=accu,
-        target_accu=0.70, 
+        target_accu=0.20, 
         log=log
         )
 

@@ -9,10 +9,10 @@ patch_encoder_type = 'same'
 update_grads_for_prototypes = True
 prototype_update_iter_step = 1
 
-experiment_run = '001'
+experiment_run = '004'
 
 data_path = './datasets/cub200_cropped/'
-train_dir = data_path + 'train_cropped/'
+train_dir = data_path + 'train_cropped_augmented/'
 test_dir = data_path + 'test_cropped/'
 aux_concept_dir = data_path + 'CUB_ConceptCrops/'
 cub_data_dir = data_path + 'CUB_200_2011/'
