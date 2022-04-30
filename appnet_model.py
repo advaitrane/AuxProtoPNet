@@ -40,6 +40,7 @@ class AuxPPNet(nn.Module):
         prototype_class_identity,
         patch_encoder_type='same',
         update_grads_for_prototypes=False,
+        prototype_weights=[0.5, 0.5],
         init_weights=True,
         prototype_activation_function='log',
         add_on_layers_type='bottleneck'
@@ -128,6 +129,11 @@ class AuxPPNet(nn.Module):
                     nn.Sigmoid()
                     )
         
+        self.unsupervised_prototype_vectors = nn.Parameter(
+            torch.rand(self.prototype_shape),
+            requires_grad=True
+            )
+
         self.prototype_vectors = torch.zeros(
             self.prototype_shape,
             requires_grad=False
@@ -137,6 +143,8 @@ class AuxPPNet(nn.Module):
             requires_grad=False
             )
         self.prototype_device = 'cpu'
+
+        self.unsupervised_w, self.supervised_w = prototype_weights
 
         # do not make this just a tensor,
         # since it will not be moved automatically to gpu
@@ -233,16 +241,22 @@ class AuxPPNet(nn.Module):
         '''
         apply self.prototype_vectors as l2-convolution filters on input x
         '''
+
+        weighted_prototype_vectors = (
+            self.unsupervised_w*self.unsupervised_prototype_vectors + 
+            self.supervised_w*self.prototype_vectors
+            )
+
         x2 = x ** 2
         x2_patch_sum = F.conv2d(input=x2, weight=self.ones)
 
-        p2 = self.prototype_vectors ** 2
+        p2 = weighted_prototype_vectors ** 2
         p2 = torch.sum(p2, dim=(1, 2, 3))
         # p2 is a vector of shape (num_prototypes,)
         # then we reshape it to (num_prototypes, 1, 1)
         p2_reshape = p2.view(-1, 1, 1)
 
-        xp = F.conv2d(input=x, weight=self.prototype_vectors)
+        xp = F.conv2d(input=x, weight=weighted_prototype_vectors)
         intermediate_result = - 2 * xp + p2_reshape  # use broadcast
         # x2_patch_sum and intermediate_result are of the same shape
         distances = F.relu(x2_patch_sum + intermediate_result)
