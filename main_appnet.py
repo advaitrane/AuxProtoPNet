@@ -1,4 +1,4 @@
-# This is branch master
+# This is branch weighted
 import os
 import shutil
 
