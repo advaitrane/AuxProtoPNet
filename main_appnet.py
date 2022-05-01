@@ -240,7 +240,7 @@ for epoch in range(num_train_epochs):
         """
         if prototype_activation_function != 'linear':
             atnt.last_only(model=appnet_multi, log=log)
-            for i in range(20):
+            for i in range(10):
                 log('iteration: \t{0}'.format(i))
                 _ = atnt.train(
                     model=appnet_multi, 
