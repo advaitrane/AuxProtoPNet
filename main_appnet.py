@@ -166,7 +166,7 @@ last_layer_optimizer = torch.optim.Adam(last_layer_optimizer_specs)
 from settings import coefs
 
 # number of training epochs, number of warm epochs, push start epoch, push epochs
-from settings import num_train_epochs, num_warm_epochs# push_start, push_epochs
+from settings import num_train_epochs, num_warm_epochs, push_start, push_epochs
 from settings import prototype_update_iter_step
 
 # train the model
@@ -239,20 +239,23 @@ for epoch in range(num_train_epochs):
                                     target_accu=0.70, log=log)
         """
         if prototype_activation_function != 'linear':
-            tnt.last_only(model=appnet_multi, log=log)
+            atnt.last_only(model=appnet_multi, log=log)
             for i in range(20):
                 log('iteration: \t{0}'.format(i))
-                _ = tnt.train(
+                _ = atnt.train(
                     model=appnet_multi, 
                     dataloader=train_loader, 
+                    aux_dataloader=concept_loader,
+                    prototype_update_iter_step=prototype_update_iter_step,
                     optimizer=last_layer_optimizer,
                     class_specific=class_specific, 
                     coefs=coefs, 
                     log=log
                     )
-                accu = tnt.test(
+                accu = atnt.test(
                     model=appnet_multi, 
                     dataloader=test_loader,
+                    aux_dataloader=concept_loader,
                     class_specific=class_specific, 
                     log=log
                     )
