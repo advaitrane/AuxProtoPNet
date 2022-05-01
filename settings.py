@@ -9,7 +9,7 @@ patch_encoder_type = 'same'
 update_grads_for_prototypes = True
 prototype_update_iter_step = 1
 
-experiment_run = '004'
+experiment_run = '006'
 
 data_path = './datasets/cub200_cropped/'
 train_dir = data_path + 'train_cropped_augmented/'
@@ -38,11 +38,11 @@ coefs = {
     'crs_ent': 1,
     'clst': 0.0008,
     'sep': -0.008,
-    'l1': 1e-4,
+    'l1': 1e-3,
 }
 
 num_train_epochs = 50
 num_warm_epochs = 5
 
-push_start = 10
-push_epochs = [i for i in range(num_train_epochs) if i % 10 == 0]
+push_start = 5
+push_epochs = [i for i in range(num_train_epochs) if i % 5 == 0]

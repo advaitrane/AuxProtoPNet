@@ -164,6 +164,8 @@ class AuxPPNet(nn.Module):
         self.num_prototype_patches = self.num_prototype_patches.to(self.prototype_device)
 
     def reset_prototypes(self):
+        # del self.prototype_vectors
+        # del self.num_prototype_patches
         self.prototype_vectors = torch.zeros(
             self.prototype_shape,
             requires_grad=False
@@ -314,10 +316,10 @@ class AuxPPNet(nn.Module):
         self.prototype_class_identity = self.prototype_class_identity[prototypes_to_keep, :]
     """
     def __repr__(self):
-        # PPNet(self, features, img_size, prototype_shape,
+        # AuxPPNet(self, features, img_size, prototype_shape,
         # proto_layer_rf_info, num_classes, init_weights=True):
         rep = (
-            'PPNet(\n'
+            'AuxPPNet(\n'
             '\tfeatures: {},\n'
             '\timg_size: {},\n'
             '\tprototype_shape: {},\n'
